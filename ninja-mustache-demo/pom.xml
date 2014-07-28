@@ -37,21 +37,7 @@
 				<configuration>
 					<source>1.7</source>
 					<target>1.7</target>
-					<compilerId>javac-with-errorprone</compilerId>
-					<forceJavacCompilerUse>true</forceJavacCompilerUse>
 				</configuration>
-				<dependencies>
-					<dependency>
-						<groupId>org.codehaus.plexus</groupId>
-						<artifactId>plexus-compiler-javac</artifactId>
-						<version>2.3</version>
-					</dependency>
-					<dependency>
-						<groupId>org.codehaus.plexus</groupId>
-						<artifactId>plexus-compiler-javac-errorprone</artifactId>
-						<version>2.3</version>
-					</dependency>
-				</dependencies>
 			</plugin>
 
             <plugin>
@@ -118,8 +104,16 @@
 					</archive>
 				</configuration>
 			</plugin>
-        </plugins>
+       
 
+            <plugin>
+                <groupId>org.ninjaframework</groupId>
+                <artifactId>ninja-maven-plugin</artifactId>
+                <version>${ninja.version}</version>
+            </plugin>
+             </plugins>
+
+ 
         <resources>
             <resource>
                 <directory>src/main/java</directory>
@@ -144,12 +138,7 @@
 
         <dependency>
             <groupId>org.ninjaframework</groupId>
-            <artifactId>ninja-core</artifactId>
-            <version>${ninja.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.ninjaframework</groupId>
-            <artifactId>ninja-servlet</artifactId>
+            <artifactId>ninja-standalone</artifactId>
             <version>${ninja.version}</version>
         </dependency>
 
@@ -157,13 +146,6 @@
             <groupId>org.ninjaframework</groupId>
             <artifactId>ninja-mustache-module</artifactId>
             <version>${ninjaMustacheVersion}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.0.1</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>

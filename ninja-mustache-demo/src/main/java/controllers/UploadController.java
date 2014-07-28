@@ -78,10 +78,12 @@ public class UploadController {
         Renderable renderable = new Renderable() {
 
             @Override
-            public void render(Context context, Result result) throws Exception {
+            public void render(Context context, Result result) {
 
                 // make sure the context really is a multipart context...
                 if (context.isMultipart()) {
+                    
+                     try {
 
                     // This is the iterator we can use to iterate over the
                     // contents
@@ -104,6 +106,7 @@ public class UploadController {
                             contentType = mimeTypes.getMimeType(name);
                         }
 
+                       
                         ResponseStreams responseStreams = context
                                 .finalizeHeaders(result);
 
@@ -119,9 +122,16 @@ public class UploadController {
 
                             ByteStreams.copy(stream,
                                     responseStreams.getOutputStream());
-
                         }
+                            
+                        
+
+                        
                     }
+                        
+                        } catch (Exception e) {
+                                
+                          }
 
                 }
 

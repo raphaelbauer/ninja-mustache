@@ -37,7 +37,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <siteProjectVersion>${project.version}</siteProjectVersion>
-        <ninja.version>3.0.0</ninja.version>
+        <ninja.version>3.2.0</ninja.version>
     </properties>
     <build>
         <pluginManagement>
@@ -45,6 +45,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.1</version>
                     <configuration>
                         <source>1.7</source>
                         <target>1.7</target>
