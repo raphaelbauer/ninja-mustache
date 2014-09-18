@@ -16,11 +16,10 @@
 
 package ninja.mustache.template;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.Map;
-
+import com.github.mustachejava.MustacheException;
+import com.github.mustachejava.MustacheFactory;
+import com.google.common.collect.Maps;
+import com.google.inject.Inject;
 import ninja.Context;
 import ninja.Result;
 import ninja.Results;
@@ -31,17 +30,16 @@ import ninja.mustache.utils.MustacheConstant;
 import ninja.template.TemplateEngineManager;
 import ninja.utils.NinjaProperties;
 import ninja.utils.ResponseStreams;
-
 import org.slf4j.Logger;
 
-import com.github.mustachejava.MustacheException;
-import com.github.mustachejava.MustacheFactory;
-import com.google.common.collect.Maps;
-import com.google.inject.Inject;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.Map;
 
 /**
  * Render Ninja with Mustache template engine (http://mustache.github.io/).
- * 
+ *
  * @author kpacha
  */
 public class MustacheTemplateEngine extends AbstractTemplateEngine {
@@ -51,86 +49,88 @@ public class MustacheTemplateEngine extends AbstractTemplateEngine {
     private final NinjaExceptionHandler exceptionHandler;
 
     private final MustacheFactory mustacheFactory;
+    private final NinjaProperties ninjaProperties;
 
     @Inject
     public MustacheTemplateEngine(Messages messages, Lang lang,
-	    Logger ninjaLogger, NinjaExceptionHandler exceptionHandler,
-	    MustacheTemplateEngineHelper templateEngineHelper,
-	    TemplateEngineManager templateEngineManager,
-	    NinjaProperties ninjaProperties, MustacheFactory mustacheFactory)
-	    throws Exception {
+                                  Logger ninjaLogger, NinjaExceptionHandler exceptionHandler,
+                                  MustacheTemplateEngineHelper templateEngineHelper,
+                                  TemplateEngineManager templateEngineManager,
+                                  NinjaProperties ninjaProperties, MustacheFactory mustacheFactory)
+            throws Exception {
+        this.ninjaProperties = ninjaProperties;
 
-	this.messages = messages;
-	this.lang = lang;
-	this.logger = ninjaLogger;
-	this.templateEngineHelper = templateEngineHelper;
-	this.exceptionHandler = exceptionHandler;
-	this.mustacheFactory = mustacheFactory;
+        this.messages = messages;
+        this.lang = lang;
+        this.logger = ninjaLogger;
+        this.templateEngineHelper = templateEngineHelper;
+        this.exceptionHandler = exceptionHandler;
+        this.mustacheFactory = mustacheFactory;
     }
 
     @Override
     public void invoke(Context context, Result result) {
-	ResponseStreams responseStreams = context.finalizeHeaders(result);
-	String templateName = templateEngineHelper.getTemplateForResult(
-		context.getRoute(), result, MustacheConstant.DEFAULT_EXTENSION);
+        ResponseStreams responseStreams = context.finalizeHeaders(result);
+        String templateName = templateEngineHelper.getTemplateForResult(
+                context.getRoute(), result, MustacheConstant.DEFAULT_EXTENSION);
 
-	render(context, responseStreams,
-		getTemplateProperties(context, result), templateName);
+        render(context, responseStreams,
+                getTemplateProperties(context, result), templateName);
     }
 
     private void render(Context context, ResponseStreams responseStreams,
-	    Map templateProperties, String templateName) {
-	try {
-	    Writer writer = mustacheFactory.compile(templateName).execute(
-		    responseStreams.getWriter(), templateProperties);
-	    writer.flush();
-	    writer.close();
-	} catch (IOException e) {
-	    handleServerError(context, e);
-	} catch (MustacheException e) {
-	    handleServerError(context, e);
-	}
+                        Map templateProperties, String templateName) {
+        try {
+            Writer writer = mustacheFactory.compile(templateName).execute(
+                    responseStreams.getWriter(), templateProperties);
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            handleServerError(context, e);
+        } catch (MustacheException e) {
+            handleServerError(context, e);
+        }
     }
 
     /**
      * A method that renders i18n messages:
-     * 
+     * <p>
      * {#i18n}mykey{/i18n}
-     * 
+     *
      * @param context
      * @param result
      * @param map
      */
     protected void insertI18nProperties(Context context, Result result, Map map) {
-	map.put("i18n", new MustacheTranslateBundleFunction(messages, context,
-		result));
+        map.put("i18n", new MustacheTranslateBundleFunction(messages, context,
+                result));
     }
 
     /**
      * handle the error: finalize the response headers, get the error template
      * and delegate the rendering to the exceptionHandler
-     * 
+     *
      * @param context
      * @param e
      */
     private void handleServerError(Context context, Exception e) {
-	ResponseStreams outStream = context.finalizeHeaders(Results
-		.internalServerError());
-	String errorTemplate = mustacheFactory
-		.compile(
-			MustacheConstant.LOCATION_VIEW_HTML_INTERNAL_SERVER_ERROR)
-		.execute(new StringWriter(), Maps.newHashMap()).toString();
-	exceptionHandler.handleException(e, errorTemplate, outStream);
+        ResponseStreams outStream = context.finalizeHeaders(Results
+                .internalServerError());
+        String errorTemplate = mustacheFactory
+                .compile(
+                        MustacheConstant.LOCATION_VIEW_HTML_INTERNAL_SERVER_ERROR)
+                .execute(new StringWriter(), Maps.newHashMap()).toString();
+        exceptionHandler.handleException(e, errorTemplate, outStream);
     }
 
     @Override
     public String getSuffixOfTemplatingEngine() {
-	return MustacheConstant.DEFAULT_EXTENSION;
+        return MustacheConstant.DEFAULT_EXTENSION;
     }
 
     @Override
     public String getContentType() {
-	return "text/html";
+        return "text/html";
     }
 
 }
